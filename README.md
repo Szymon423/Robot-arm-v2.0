@@ -12,7 +12,8 @@ Work schedule:
   - XD.exe
   - repairing shit
   - testing PID control (only P will work better?)
-* developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICOS
+* developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICO
+* developing software for motion controll (maybe via website)
 
 
 # Work progress

@@ -13,3 +13,13 @@ Work schedule:
 * developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICOS
 
 
+# Work progress
+
+## Test bench
+
+
+## Breadboard circuit
+![breadboard circuit](https://user-images.githubusercontent.com/96399051/177648382-e4b1d714-72dd-4592-b217-a7d538ed505d.jpg)
+
+## Designed PCB
+![PCB-rev-1 3](https://user-images.githubusercontent.com/96399051/177648128-81e2d887-7d0c-41ad-a370-b2cb5ed316cc.png)

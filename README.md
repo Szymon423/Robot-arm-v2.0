@@ -6,8 +6,8 @@ Work schedule:
   - creating test bench ✔️
   - creating bradboard circuit ✔️
   - turning breadboard into PCB ✔️
+  - collecting all necessary components ✔️
   - waiting months for order on JLCPCB (almost here)
-  - gathering all necessary components ✔️
   - soldering all components
   - realising that i've made a mistake (hope I didn't)
   - XD.exe
@@ -30,5 +30,8 @@ Work schedule:
 
 ## Designed PCB
 ![PCB-rev-1 3](https://user-images.githubusercontent.com/96399051/177648128-81e2d887-7d0c-41ad-a370-b2cb5ed316cc.png)
+
+## Collecting all components
+![components](https://user-images.githubusercontent.com/96399051/178782339-38a9e303-52ff-405e-9f5b-0f3172e58be2.png)
 
 ## Currently waiting for PCB arrival... 😃

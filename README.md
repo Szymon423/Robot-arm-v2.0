@@ -49,4 +49,10 @@ Also I want to redo entire software side of project. I want to be able of contro
 ### Collecting all components
 ![components](https://user-images.githubusercontent.com/96399051/178782339-38a9e303-52ff-405e-9f5b-0f3172e58be2.png)
 
-### Currently waiting for PCB arrival... 😃
+### Recieving tiny package from JLC PCB
+![IMG20220717200212](https://user-images.githubusercontent.com/96399051/179423982-54247350-67dc-4910-ad82-a00b74e1ac0e.jpg)
+![IMG20220717200700](https://user-images.githubusercontent.com/96399051/179423987-50d1d0ac-7d39-4e72-b129-96932e67ab95.jpg)
+
+### Soldering all components to PCB
+![ready-PCB](https://user-images.githubusercontent.com/96399051/179424211-2a6c7309-6533-4897-8044-15ed67c86128.png)
+

@@ -56,3 +56,4 @@ Also I want to redo entire software side of project. I want to be able of contro
 ### Soldering all components to PCB
 ![ready-PCB](https://user-images.githubusercontent.com/96399051/179424211-2a6c7309-6533-4897-8044-15ed67c86128.png)
 
+### Testing stage (hope is going to be smooth)

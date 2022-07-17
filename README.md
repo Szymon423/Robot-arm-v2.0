@@ -22,8 +22,8 @@ Also I want to redo entire software side of project. I want to be able of contro
   - creating bradboard circuit ✔️
   - turning breadboard into PCB ✔️
   - collecting all necessary components ✔️
-  - waiting months for order on JLCPCB (almost here)
-  - soldering all components
+  - waiting months for order on JLCPCB ✔️
+  - soldering all components 1/4
   - realising that i've made a mistake (hope I didn't)
   - XD.exe
   - repairing shit

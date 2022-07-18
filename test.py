@@ -25,6 +25,15 @@ redLED_pin.value(0)
 relG_pin.value(0)
 relR_pin.value(0)
 
+# interrupt handler
+def alert(pin):
+    # miejsce na stary kod
+
+
+# attaching the intterupt
+encA_pin.irq(trigger = Pin.IRQ_RISING,
+             handler = alert)
+
 
 # MAIN loop
 while True:
@@ -40,4 +49,5 @@ while True:
     sleep_ms(100)
     redLED_pin.toggle()
     sleep_ms(100)
+
 

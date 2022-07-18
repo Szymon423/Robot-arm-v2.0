@@ -13,7 +13,7 @@ Unfortunately there were some issues which made this project not as good as I wa
 I want to create my own closed loop controllers for stepper motors. For this purpouse I've order open loop controller and my goal is to design hardware and software necessary for proper closed loop controll of every motor in my robot.
 
 ### Other changes I want to make 🆕
-Also I want to redo entire software side of project. I want to be able of controlling robot via website, and use my Raspberry PI 4B 2G as brain of my robot. How it's all going to turn out? We will see.
+Also I want to redo entire software side of project. I want to be able of controlling robot via website, and use my Raspberry PI 4B 2Gb as brain of my robot. How it's all going to turn out? We will see.
 
 
 ## Work schedule: 📅
@@ -23,7 +23,7 @@ Also I want to redo entire software side of project. I want to be able of contro
   - turning breadboard into PCB ✔️
   - collecting all necessary components ✔️
   - waiting months for order on JLCPCB ✔️
-  - soldering all components 1/4
+  - soldering all components 2/4
   - realising that i've made a mistake (hope I didn't)
   - XD.exe
   - repairing shit
@@ -57,3 +57,7 @@ Also I want to redo entire software side of project. I want to be able of contro
 ![ready-PCB](https://user-images.githubusercontent.com/96399051/179424211-2a6c7309-6533-4897-8044-15ed67c86128.png)
 
 ### Testing stage (hope is going to be smooth)
+ - Encoder readings are working ✔️ 
+ - Status LEDs are working ✔️
+ - Stepper motor controll
+ - end switches

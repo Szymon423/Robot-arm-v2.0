@@ -57,7 +57,19 @@ Also I want to redo entire software side of project. I want to be able of contro
 ![ready-PCB](https://user-images.githubusercontent.com/96399051/179424211-2a6c7309-6533-4897-8044-15ed67c86128.png)
 
 ### Testing stage (hope is going to be smooth)
- - Encoder readings are working ✔️ 
+ - Encoder readings are working ❌
  - Status LEDs are working ✔️
- - Stepper motor controll
- - end switches
+ - Stepper motor controll ✔️
+ - end switches ✔️
+
+### Realising that i've made a mistake
+My encoder readings were good until I was trying to move rotor faster than 20 rpm. While moving it faster counters started loosing steps.
+My first thought was that my programm whitch was written in python was to slow to maitain IRQ from encoder (which has 1000 ppr - quite a lot). 
+Unfortunatelly when i wrote the same program in c/c++ same shit happend. Even after using of program delivered by Raspberry pi in examples programs (prorgam which was using PIO of my PICO, which were programmed in ASEMBLY language, this shit still didn't want to cooperate. At this moment I realised that it was hardware issue. Next photo shows output of optocoupler which was driven by differential encoder output.
+![przed](https://user-images.githubusercontent.com/96399051/181518017-7adf4cc8-371d-4013-b149-62f21c12ca23.jpg)
+
+
+### XD.exe
+
+### Repairing shit
+

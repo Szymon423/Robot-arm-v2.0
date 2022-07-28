@@ -65,11 +65,18 @@ Also I want to redo entire software side of project. I want to be able of contro
 ### Realising that i've made a mistake
 My encoder readings were good until I was trying to move rotor faster than 20 rpm. While moving it faster counters started loosing steps.
 My first thought was that my programm whitch was written in python was to slow to maitain IRQ from encoder (which has 1000 ppr - quite a lot). 
-Unfortunatelly when i wrote the same program in c/c++ same shit happend. Even after using of program delivered by Raspberry pi in examples programs (prorgam which was using PIO of my PICO, which were programmed in ASEMBLY language, this shit still didn't want to cooperate. At this moment I realised that it was hardware issue. Next photo shows output of optocoupler which was driven by differential encoder output.
-![przed](https://user-images.githubusercontent.com/96399051/181518017-7adf4cc8-371d-4013-b149-62f21c12ca23.jpg)
-
+Unfortunatelly when i wrote the same program in c/c++ same shit happend. Even after using of program delivered by Raspberry pi in examples programs (prorgam which was using PIO of my PICO, which were programmed in ASEMBLY language, this shit still didn't want to cooperate. At this moment I realised that it was hardware issue.
 
 ### XD.exe
+Next photo shows output of optocoupler which was driven by differential encoder output.
+![przed](https://user-images.githubusercontent.com/96399051/181518017-7adf4cc8-371d-4013-b149-62f21c12ca23.jpg)
+
+As You can easli see, there is fucking big as fuck inertia. Time responses of my optocoupler acording to the datasheet were maximally around 20 μs. In the photo abowe falling edge was pretty quick but rising edge was around 250 μs wide. It means that it exceedes over 10 time max value from datasheet.
 
 ### Repairing shit
+After some time and help of my colleagues we discovered that same situation is taking place with different optocouplers. rising edge still looked not good. Becouse of quite well known shape of rising edge - inertial behaviour we figured out that there must be some not wanted cappacity.
+
+How it turned out?
+
+By looking on my microcontroller datasheet I've found that internal pullup resistor was something like 50k - 100k (I couldn't found any proper values). If there was any cappacity, while discharging (rising edge of optocoupler) current from this cappacity had to flow via this big resistor. So to make it faster I decided to add external pullup resistor with drasticly lower value of 1k. 
 

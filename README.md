@@ -23,11 +23,11 @@ Also I want to redo entire software side of project. I want to be able of contro
   - turning breadboard into PCB ✔️
   - collecting all necessary components ✔️
   - waiting months for order on JLCPCB ✔️
-  - soldering all components 2/4
-  - realising that i've made a mistake (hope I didn't)
-  - XD.exe
-  - repairing shit
-  - testing PID control (only P will work better?)
+  - soldering all components 2/4 ✔️
+  - realising that i've made a mistake (hope I didn't) ✔️
+  - XD.exe ✔️
+  - repairing shit ✔️
+  - testing PID control (only P will work better?) 
 * developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICO
 * developing software for motion controll (maybe via website)
 

@@ -83,6 +83,11 @@ By looking on my microcontroller datasheet I've found that internal pullup resis
 Without any changes in code (still using internal pullup) previous inertia changed into something like this:
 ![po](https://user-images.githubusercontent.com/96399051/181521899-1e8561e3-d804-4944-85c5-8afe1a2b95c3.jpg)
 
-As You can see it is quite smaller - around 10 μs.
+As You can see it is quite smaller - around 10 μs. And now readings from encoder are perfect at least for this project (until some quite big speed - fixing this requires faster optocouplers).
 
+### Testing stage vol.2
+ - Encoder readings are working ✔️
+ - Status LEDs are working ✔️
+ - Stepper motor controll ✔️
+ - end switches ✔️
 

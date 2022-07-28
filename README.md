@@ -76,7 +76,13 @@ As You can easli see, there is fucking big as fuck inertia. Time responses of my
 ### Repairing shit
 After some time and help of my colleagues we discovered that same situation is taking place with different optocouplers. rising edge still looked not good. Becouse of quite well known shape of rising edge - inertial behaviour we figured out that there must be some not wanted cappacity.
 
-How it turned out?
+<em>How it turned out?</em>
 
 By looking on my microcontroller datasheet I've found that internal pullup resistor was something like 50k - 100k (I couldn't found any proper values). If there was any cappacity, while discharging (rising edge of optocoupler) current from this cappacity had to flow via this big resistor. So to make it faster I decided to add external pullup resistor with drasticly lower value of 1k. 
+
+Without any changes in code (still using internal pullup) previous inertia changed into something like this:
+![po](https://user-images.githubusercontent.com/96399051/181521899-1e8561e3-d804-4944-85c5-8afe1a2b95c3.jpg)
+
+As You can see it is quite smaller - around 10 μs.
+
 

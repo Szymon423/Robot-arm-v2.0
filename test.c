@@ -19,8 +19,29 @@ uint32_t timer_cnt = 0;
 uint32_t timer_lim = 2;
 int encoder_value = 0;
 int target_value = 0;
-int histeresis = 10;
+float error_max = 1000.0;
+int time_max = 1000.0;
+int position_error = 0;
+float histeresis = 4.0;
+float a = 1;
+float b = 0;
 bool on = true;
+
+struct Regulator
+{
+    float P;
+    float I;
+    float D;
+
+    float kP;
+    float kI;
+    float kD;
+
+    float sum;
+    float abs_sum;
+};
+
+struct Regulator regulator = {1.0, 0.0, 0.0, 50.0, 0.0, 0.0, 0.0};
 
 
 //setting up encoder readin via PIO
@@ -28,20 +49,59 @@ const uint PIN_AB = A_PIN;
 const uint sm = 0;
 PIO pio = pio0;
 
+float abs (float in)
+{
+    if (in <= 0.0) 
+    {
+        return -in;
+    }
+    else
+    {
+        return in;
+    }
+}
 
 
 
 bool repeating_timer_callback_PTO(struct repeating_timer *t)
 {
+    // reading of current position  via DMA
     encoder_value = quadrature_encoder_get_count(pio, sm);
-    if (encoder_value > target_value + histeresis)
+
+    // defining current error basen on current and target positions
+    position_error = target_value - encoder_value;
+
+    // calcultion of P value based on error
+    regulator.P = position_error * regulator.kP;
+
+    // regulator.sum = regulator.P + regulator.I + regulator.D; // I and D =0
+    regulator.sum = regulator.P;
+    regulator.abs_sum = abs(regulator.sum);
+
+    //setting proper timer limit based on regulator output
+    if (regulator.abs_sum > error_max)
     {
-        gpio_put(DIR_PIN, 0);
-        on = true;
+        timer_lim = 2;
     }
-    else if (encoder_value < target_value - histeresis)
+    else if (regulator.abs_sum < histeresis)
+    {
+        timer_lim = 1000;
+        // printf("suma: %f abs(suma): %f hist: %f \n", regulator.sum, abs(regulator.sum), histeresis);
+    }
+    else 
+    {
+        timer_lim = (int)(a * regulator.abs_sum + b);
+    }
+    
+
+    if (regulator.sum > histeresis)
     {
         gpio_put(DIR_PIN, 1);
+        on = true;
+    }
+    else if (regulator.sum < -histeresis)
+    {
+        gpio_put(DIR_PIN, 0);
         on = true;
     }
     else 
@@ -66,7 +126,7 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
         }  
     }
     
-    timer_cnt += 1;12
+    timer_cnt += 1;
     
     return true;
 }
@@ -79,7 +139,12 @@ int main() {
     uint offset = pio_add_program(pio, &quadrature_encoder_program);
     quadrature_encoder_program_init(pio, sm, offset, PIN_AB, 0);
     
+    // calculaing interpolation due to histeresis
+    a = (time_max - 2) / (histeresis - error_max);
+    b = 2 - a * error_max;
     
+
+
     // encodrer pins
     gpio_init(A_PIN);
     gpio_init(B_PIN);
@@ -117,7 +182,7 @@ int main() {
        
            
        
-       printf("odczytane: %d enkoder: %d \n", target_value, encoder_value);
+       printf("odczytane: %d enkoder: %d err: %d regulator-sum: %f loop-time: %d a: %f b: %f \n", target_value, encoder_value, position_error, regulator.sum, timer_lim, a, b);
        
        
     }

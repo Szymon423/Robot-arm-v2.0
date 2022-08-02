@@ -14,18 +14,22 @@
 #define DIR_PIN 6
 
 
-
+// necessary variables 
 uint32_t timer_cnt = 0;
 uint32_t timer_lim = 2;
 int encoder_value = 0;
 int target_value = 0;
+int read_value = 0;
+float current_value = 0.0;
+float previous_value = 0.0;
 float error_max = 1000.0;
 int time_max = 1000.0;
 int position_error = 0;
-float histeresis = 4.0;
+float histeresis = 2.0;
 float a = 1;
 float b = 0;
 bool on = true;
+float div = 0.9999;
 
 struct Regulator
 {
@@ -49,6 +53,7 @@ const uint PIN_AB = A_PIN;
 const uint sm = 0;
 PIO pio = pio0;
 
+// function y = |x|
 float abs (float in)
 {
     if (in <= 0.0) 
@@ -65,6 +70,11 @@ float abs (float in)
 
 bool repeating_timer_callback_PTO(struct repeating_timer *t)
 {
+    // smoothing the target value
+    current_value = (1.0 - div) * (float)read_value + div * previous_value;
+    previous_value = current_value;
+    target_value = (int)current_value;
+    
     // reading of current position  via DMA
     encoder_value = quadrature_encoder_get_count(pio, sm);
 
@@ -86,14 +96,13 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
     else if (regulator.abs_sum < histeresis)
     {
         timer_lim = 1000;
-        // printf("suma: %f abs(suma): %f hist: %f \n", regulator.sum, abs(regulator.sum), histeresis);
     }
     else 
     {
         timer_lim = (int)(a * regulator.abs_sum + b);
     }
     
-
+    // setting proper direcion based on regulator sum
     if (regulator.sum > histeresis)
     {
         gpio_put(DIR_PIN, 1);
@@ -109,7 +118,7 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
         on = false;
     }
     
-    
+    // creating actual squarewave
     if (timer_cnt >= timer_lim)
     {
         timer_cnt = 0;
@@ -171,19 +180,29 @@ int main() {
     add_repeating_timer_us(40, repeating_timer_callback_PTO, NULL, &timer);
     
     char data;
+    int part_number = 0;
+    int whole_number = 0;    
     
- 
     while (1) 
     {
        
        data = getchar();
+       if (data == 'n')
+       {
+           read_value = whole_number;
+           //printf("tg_val: %d", target_value);
+           whole_number = 0;
+       }
+       else
+       {
+           part_number = data - '0';
+           whole_number = 10 * whole_number + part_number;
+       }
+      
        
-       target_value = 1000 * (data - '0');
-       
-           
-       
-       printf("odczytane: %d enkoder: %d err: %d regulator-sum: %f loop-time: %d a: %f b: %f \n", target_value, encoder_value, position_error, regulator.sum, timer_lim, a, b);
-       
-       
+       //data = getchar();
+       //printf("%d\n", encoder_value);
+       //printf("odczytane: %d enkoder: %d err: %d regulator-sum: %f loop-time: %d a: %f b: %f \n", target_value, encoder_value, position_error, regulator.sum, timer_lim, a, b);
+
     }
 }

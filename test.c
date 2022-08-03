@@ -23,13 +23,15 @@ int read_value = 0;
 float current_value = 0.0;
 float previous_value = 0.0;
 float error_max = 1000.0;
-int time_max = 1000.0;
+float error_min = 3.0;
+float time_max = 1000;;
+float time_min = 2;
 int position_error = 0;
-float histeresis = 2.0;
+float histeresis = 3.0;
 float a = 1;
 float b = 0;
 bool on = true;
-float div = 0.9999;
+float div = 0.99;
 
 struct Regulator
 {
@@ -91,15 +93,19 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
     //setting proper timer limit based on regulator output
     if (regulator.abs_sum > error_max)
     {
-        timer_lim = 2;
+        timer_lim = (int)time_min;
     }
-    else if (regulator.abs_sum < histeresis)
+    else if (regulator.abs_sum < error_min)
     {
-        timer_lim = 1000;
+        timer_lim = (int)time_max;
     }
     else 
     {
-        timer_lim = (int)(a * regulator.abs_sum + b);
+        // linear time, not linear speed
+        //timer_lim = (int)(a * regulator.abs_sum + b);
+        
+        // linear speed, not linear time
+        timer_lim = (int)(a / (regulator.abs_sum - b));
     }
     
     // setting proper direcion based on regulator sum
@@ -149,9 +155,14 @@ int main() {
     quadrature_encoder_program_init(pio, sm, offset, PIN_AB, 0);
     
     // calculaing interpolation due to histeresis
-    a = (time_max - 2) / (histeresis - error_max);
-    b = 2 - a * error_max;
     
+    // linear time, not linear speed
+    //a = (time_max - time_min) / (error_min - error_max);
+    //b = time_min - a * error_max;
+    
+    // linear speed, not linear time
+    b = time_min * error_max - time_max * error_min;
+    a = time_max * (error_min - b);
 
 
     // encodrer pins
@@ -206,3 +217,4 @@ int main() {
 
     }
 }
+

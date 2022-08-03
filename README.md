@@ -30,6 +30,7 @@ Also I want to redo entire software side of project. I want to be able of contro
   - testing PID control ✔️
 * developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICO <em>~IN PROGRESS~</em>
 * developing software for motion controll (maybe via website)
+* making it look good - some kind of enclosure
 
 
 ## Work progress 📈
@@ -130,5 +131,5 @@ Well.. I see two major disadvantages. In classis analogue control theory using i
 
 Second disadvantage is increased cycle time of my IRQ becouse of need to constantly calculating integral with trapezoidal method. Which requires measuring time between current and las IRQ. Which will lead to decrease in speed of my motor.
 
-#### TO DO: Extend this theoretical part into survey and present some plots.
-
+### Developing communication between Raspberry pi 4B - brain of entire system and motor controlling units - Raspberry pi PICOs
+To be continiued...

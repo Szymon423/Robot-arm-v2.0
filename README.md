@@ -133,3 +133,9 @@ Second disadvantage is increased cycle time of my IRQ becouse of need to constan
 
 ### Developing communication between Raspberry pi 4B - brain of entire system and motor controlling units - Raspberry pi PICOs
 To be continiued...
+
+
+### Side ideas
+* make it work as G-code - let the inverse kinematics caluculate entire path, but uC will recieve target points with desired speed and accelerations. It will make communication bus simpler and will not relay entirely on communication during every move.
+
+* while controlling robot with gamepad - uC will recieve speed values for every motor instead of rotor position

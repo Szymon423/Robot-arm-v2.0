@@ -134,6 +134,10 @@ Second disadvantage is increased cycle time of my IRQ becouse of need to constan
 ### Developing communication between Raspberry pi 4B - brain of entire system and motor controlling units - Raspberry pi PICOs
 To be continiued...
 
+### To do
+* implement variable speed depending on recieved value from master,
+* check if it is necesarry to recalculate a and b every new speed value or I can just limit upper speed value,
+* try to run master.py from linux - will be easier / adapt for both platforms (win10/11 and linux)
 
 ### Side ideas
 * make it work as G-code - let the inverse kinematics caluculate entire path, but uC will recieve target points with desired speed and accelerations. It will make communication bus simpler and will not relay entirely on communication during every move.

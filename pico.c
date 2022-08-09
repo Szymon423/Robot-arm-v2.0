@@ -209,26 +209,42 @@ int main() {
     struct repeating_timer timer;
     add_repeating_timer_us(-timer_delay, repeating_timer_callback_PTO, NULL, &timer);
     
-    char data;
+    char incoming_char;
+    char char_array[20];
+    int char_index = 0;
     int part_number = 0;
     int whole_number = 0;    
     
     while (1) 
     {
        
-       data = getchar();
-       if (data == 'n')
+    //    data = getchar();
+    //    if (data == 'n')
+    //    {
+    //        read_value = whole_number;
+    //        //printf("tg_val: %d", target_value);
+    //        whole_number = 0;
+    //        printf("read_value: %d", read_value);
+    //    }
+    //    else
+    //    {
+    //        part_number = data - '0';
+    //        whole_number = 10 * whole_number + part_number;
+    //    }
+
+       incoming_char = getchar();
+       char_array[char_index] = incoming_char;
+       if (incoming_char == 'n')
        {
-           read_value = whole_number;
-           //printf("tg_val: %d", target_value);
-           whole_number = 0;
-           printf("a: %f b: %f \n", a, b);
+           printf("tg_val: %c", char_array);
+           char_index = 0;
+           char_array = {0};
        }
        else
        {
-           part_number = data - '0';
-           whole_number = 10 * whole_number + part_number;
+           char_index += 1;
        }
+
       
        
        //data = getchar();

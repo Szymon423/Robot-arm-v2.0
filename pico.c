@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
@@ -29,7 +31,7 @@ int target_value = 0;       // current goal value
 int read_value = 0;         // value which was read by uC
 float current_value = 0.0;  // current position value - for smoothing
 float previous_value = 0.0; // previous position value - for smoothing
-float div = 0.99;           // smooting value
+float division = 0.99;           // smooting value
 int position_error = 0;     // current error in position
 float histeresis = 2.0;     // geting rid of shaky movements with histeresis
 
@@ -46,7 +48,7 @@ float c = -0.1;             //
 bool on = true;
 
 // defining proper kP gain
-float kP_reg = 10.0;
+const float kP_reg = 10.0;
 
 // structure with regulator stuff
 struct Regulator
@@ -75,24 +77,12 @@ const uint PIN_AB = A_PIN;
 const uint sm = 0;
 PIO pio = pio0;
 
-// function y = |x|
-float abs (float in)
-{
-    if (in <= 0.0) 
-    {
-        return -in;
-    }
-    else
-    {
-        return in;
-    }
-}
 
 // function responsible for IRQ handling
 bool repeating_timer_callback_PTO(struct repeating_timer *t)
 {
     // smoothing the target value
-    current_value = (1.0 - div) * (float)read_value + div * previous_value;
+    current_value = (1.0 - division) * (float)read_value + division * previous_value;
     previous_value = current_value;
     target_value = (int)current_value;
     
@@ -211,34 +201,52 @@ int main() {
     
     char incoming_char;
     char char_array[20];
+    char speed_arr[10];
+    char position_arr[10];
+
+    memset(char_array, 0, sizeof(char_array));
+    memset(position_arr, 0, sizeof(position_arr));
+    memset(speed_arr, 0, sizeof(speed_arr));
+
     int char_index = 0;
-    int part_number = 0;
-    int whole_number = 0;    
+    int x_index = 0;    
+    int n_index = 0;
+    int position_value = 0;
+    float speed_value = 0.0;
+    
     
     while (1) 
     {
        
-    //    data = getchar();
-    //    if (data == 'n')
-    //    {
-    //        read_value = whole_number;
-    //        //printf("tg_val: %d", target_value);
-    //        whole_number = 0;
-    //        printf("read_value: %d", read_value);
-    //    }
-    //    else
-    //    {
-    //        part_number = data - '0';
-    //        whole_number = 10 * whole_number + part_number;
-    //    }
-
        incoming_char = getchar();
        char_array[char_index] = incoming_char;
        if (incoming_char == 'n')
        {
-           printf("tg_val: %c", char_array);
+           // find 'x' position
+           char *ptr1 = strchr(char_array, 'x');
+           x_index = ptr1 - char_array;
+
+           // find 'n' position
+           char *ptr2 = strchr(char_array, 'n');
+           n_index = ptr2 - char_array;
+
+           // make substring for position
+           memcpy(position_arr, &char_array[0], x_index);
+
+           // make substring for speed
+           memcpy(speed_arr, &char_array[x_index + 1], n_index - x_index - 1);
+           
+           position_value = atoi(position_arr);
+           speed_value = atof(speed_arr);
+
+           printf("pos: %d  spe: %f", position_value, speed_value);
+    
+           
+           // resetting everything
            char_index = 0;
-           char_array = {0};
+           memset(char_array, 0, sizeof(char_array));
+           memset(position_arr, 0, sizeof(position_arr));
+           memset(speed_arr, 0, sizeof(speed_arr));
        }
        else
        {

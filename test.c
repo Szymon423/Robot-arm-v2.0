@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 #include "hardware/timer.h"
@@ -13,24 +14,33 @@
 #define STEP_PIN 5
 #define DIR_PIN 6
 
+#define timer_delay 40
+#define steps_per_revolution 5000
+
 
 // necessary variables 
 uint32_t timer_cnt = 0;
-uint32_t timer_lim = 2;
+uint32_t timer_lim = 1;
 int encoder_value = 0;
 int target_value = 0;
 int read_value = 0;
 float current_value = 0.0;
 float previous_value = 0.0;
+
 float error_max = 1000.0;
 float error_min = 3.0;
-float time_max = 1000;;
-float time_min = 2;
+float time_max = 1000.0;
+float time_min = 1.0;
+
 int position_error = 0;
-float histeresis = 3.0;
-float a = 1;
-float b = 0;
+float histeresis = 2.0;
+
+float a = 1.0;
+float b = 0.0;
+float c = -0.1;
+
 bool on = true;
+
 float div = 0.99;
 
 struct Regulator
@@ -47,7 +57,7 @@ struct Regulator
     float abs_sum;
 };
 
-struct Regulator regulator = {1.0, 0.0, 0.0, 50.0, 0.0, 0.0, 0.0};
+struct Regulator regulator = {1.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0};
 
 
 //setting up encoder readin via PIO
@@ -86,26 +96,28 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
     // calcultion of P value based on error
     regulator.P = position_error * regulator.kP;
 
-    // regulator.sum = regulator.P + regulator.I + regulator.D; // I and D =0
+    // regulator.sum = regulator.P + regulator.I + regulator.D; // I and D = 0
     regulator.sum = regulator.P;
     regulator.abs_sum = abs(regulator.sum);
 
     //setting proper timer limit based on regulator output
-    if (regulator.abs_sum > error_max)
+    if (regulator.abs_sum > error_max) 
     {
+        // max speed when sum excedees max error
         timer_lim = (int)time_min;
-    }
-    else if (regulator.abs_sum < error_min)
+    } 
+    else if (regulator.abs_sum < error_min) 
     {
+        // min speed for small errors
         timer_lim = (int)time_max;
-    }
+    } 
     else 
     {
         // linear time, not linear speed
         //timer_lim = (int)(a * regulator.abs_sum + b);
         
         // linear speed, not linear time
-        timer_lim = (int)(a / (regulator.abs_sum - b));
+        timer_lim = (int)(a / (regulator.abs_sum - b) + c);
     }
     
     // setting proper direcion based on regulator sum
@@ -129,9 +141,14 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
     {
         timer_cnt = 0;
     }
+    else 
+    {
+        timer_cnt += 1;
+    }
+    // making step
     if (on)
     {
-        if (timer_cnt >= (timer_lim / 2))
+        if ((float)timer_cnt >= (0.5 * (float)timer_lim))
         {
             gpio_put(STEP_PIN, 0);
         } 
@@ -140,8 +157,6 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
             gpio_put(STEP_PIN, 1);
         }  
     }
-    
-    timer_cnt += 1;
     
     return true;
 }
@@ -161,8 +176,8 @@ int main() {
     //b = time_min - a * error_max;
     
     // linear speed, not linear time
-    b = time_min * error_max - time_max * error_min;
-    a = time_max * (error_min - b);
+    b = (time_min * error_max - time_max * error_min + c * (error_min - error_max)) / (time_min - time_max);
+    a = (time_min - c) * (error_max - b);
 
 
     // encodrer pins
@@ -188,7 +203,7 @@ int main() {
     
     //calling timer IRQ
     struct repeating_timer timer;
-    add_repeating_timer_us(40, repeating_timer_callback_PTO, NULL, &timer);
+    add_repeating_timer_us(-timer_delay, repeating_timer_callback_PTO, NULL, &timer);
     
     char data;
     int part_number = 0;
@@ -203,6 +218,7 @@ int main() {
            read_value = whole_number;
            //printf("tg_val: %d", target_value);
            whole_number = 0;
+           printf("a: %f b: %f \n", a, b);
        }
        else
        {
@@ -217,4 +233,3 @@ int main() {
 
     }
 }
-

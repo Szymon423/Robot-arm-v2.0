@@ -7,57 +7,67 @@
 
 #include "quadrature_encoder.pio.h"
 
-
+// attaching encoder pins
 #define A_PIN 11
 #define B_PIN 12
 
+// attaching stepper motor pins
 #define STEP_PIN 5
 #define DIR_PIN 6
 
+//values for calculating speed
 #define timer_delay 40
 #define steps_per_revolution 5000
 
+// timer variables
+uint32_t timer_cnt = 0;     // timer current value
+uint32_t timer_lim = 1;     // timer upper limit value
 
-// necessary variables 
-uint32_t timer_cnt = 0;
-uint32_t timer_lim = 1;
-int encoder_value = 0;
-int target_value = 0;
-int read_value = 0;
-float current_value = 0.0;
-float previous_value = 0.0;
+// position maitaining values
+int encoder_value = 0;      // current encoder reading
+int target_value = 0;       // current goal value
+int read_value = 0;         // value which was read by uC
+float current_value = 0.0;  // current position value - for smoothing
+float previous_value = 0.0; // previous position value - for smoothing
+float div = 0.99;           // smooting value
+int position_error = 0;     // current error in position
+float histeresis = 2.0;     // geting rid of shaky movements with histeresis
 
-float error_max = 1000.0;
-float error_min = 3.0;
-float time_max = 1000.0;
-float time_min = 1.0;
+// error - speed charakcteristic 
+float error_max = 1000.0;   // max value of error
+float error_min = 3.0;      // min value of error
+float time_max = 1000.0;    // max value of duty cycle
+float time_min = 1.0;       // min value of duty cycle
+float a = 1.0;              //
+float b = 0.0;              // f(x) = a * (x - b) + c
+float c = -0.1;             //
 
-int position_error = 0;
-float histeresis = 2.0;
-
-float a = 1.0;
-float b = 0.0;
-float c = -0.1;
-
+// variable defining need of movement
 bool on = true;
 
-float div = 0.99;
+// defining proper kP gain
+float kP_reg = 10.0;
 
+// structure with regulator stuff
 struct Regulator
 {
+    // current PID values
     float P;
     float I;
     float D;
 
+    // proper gains 
     float kP;
     float kI;
     float kD;
 
+    // output and |output|
     float sum;
     float abs_sum;
 };
 
-struct Regulator regulator = {1.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0};
+// defining regulator struct
+struct Regulator regulator = {1.0, 0.0, 0.0, kP_reg, 0.0, 0.0, 0.0};
 
 
 //setting up encoder readin via PIO
@@ -78,8 +88,7 @@ float abs (float in)
     }
 }
 
-
-
+// function responsible for IRQ handling
 bool repeating_timer_callback_PTO(struct repeating_timer *t)
 {
     // smoothing the target value
@@ -165,15 +174,10 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
 int main() {
 
     stdio_init_all();
-
+    
+    // encoder PIO initialisation
     uint offset = pio_add_program(pio, &quadrature_encoder_program);
     quadrature_encoder_program_init(pio, sm, offset, PIN_AB, 0);
-    
-    // calculaing interpolation due to histeresis
-    
-    // linear time, not linear speed
-    //a = (time_max - time_min) / (error_min - error_max);
-    //b = time_min - a * error_max;
     
     // linear speed, not linear time
     b = (time_min * error_max - time_max * error_min + c * (error_min - error_max)) / (time_min - time_max);

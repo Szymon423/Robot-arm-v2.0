@@ -23,31 +23,47 @@ time_base = 40  # 40us - duty cykle of interrupt -> min 80us for proper pulse fo
 time_cnt = 1    
 
 error = np.linspace(3, 1000, 998, dtype=int)
+
 time = a / (error - b) + c
 
 time_sub = np.asarray(time * 2 * time_base, dtype=int)  # times 2 bcoz of need of two edges rising and falling for proper step
 time_cnt_arr = np.array(time_sub / 1000.0, dtype=float) # div by 1000.0 us -> ms
 
 plt.figure(1)
-plt.plot(error, time_cnt_arr)
+plt.plot(error, time)
 plt.grid()
 plt.xlabel("error value")
 plt.ylabel("duty cycle [ms]")
-plt.title("Duty cycle")
+plt.title("time = a / (error - b) + c")
 # plt.xlim([3, 1000])
 print("duty cycle f(1000) = ", time_cnt_arr[-1], "good: 0.08")
 print("duty cycle f(3) = ", time_cnt_arr[0], "good: 80.0")
 
 ## frequency plot
-freq = 1 / time_cnt_arr
+freq = 1000.0 / time_cnt_arr
 
 plt.figure(2)
 plt.plot(error, freq)
 plt.grid()
 plt.xlabel("error value")
 plt.ylabel("frequency [kHz]")
-plt.title("Control signal frequency")
+plt.title("freq = 1 / time_sub")
 # plt.xlim([3, 1000])
 print("frequency f(1000) = ", freq[-1], "good: 12.5")
+
+
+time_new = (10**6) / (2 * time_base * freq)
+err_new = a * 2 * time_base * freq / (10**6 - c * 2 * time_base * freq) + b
+
+
+plt.figure(3)
+plt.plot(freq, time_new)
+plt.grid()
+plt.xlabel("error value")
+plt.ylabel("frequency [kHz]")
+plt.title("freq_new = (error - b) / (a + c * (error - b))")
+# plt.xlim([3, 1000])
+print("frequency f(1000) = ", freq[-1], "good: 12.5")
+
 
 plt.show()

@@ -28,7 +28,12 @@ Also I want to redo entire software side of project. I want to be able of contro
   - XD.exe ✔️
   - repairing shit ✔️
   - testing PID control ✔️
-* developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICO <em>~IN PROGRESS~</em>
+* developing communication between Raspberry pi 4B - Brain of entire system and motor controlling units - Raspberry pi PICO 
+  - developing general idea of communication ✔️
+  - do all necesarry speed/frequency/position/error calculations, ✔️
+  - simple testing program for checking if it works, ✔️
+  - implementing inverse kinematics
+  - <em>IN PROGRESS</em>
 * developing software for motion controll (maybe via website)
 * making it look good - some kind of enclosure
 
@@ -131,16 +136,38 @@ Well.. I see two major disadvantages. In classis analogue control theory using i
 
 Second disadvantage is increased cycle time of my IRQ becouse of need to constantly calculating integral with trapezoidal method. Which requires measuring time between current and las IRQ. Which will lead to decrease in speed of my motor.
 
-### Developing communication between Raspberry pi 4B - brain of entire system and motor controlling units - Raspberry pi PICOs
-To be continiued...
+## Developing communication between Raspberry pi 4B - brain of entire system and motor controlling units - Raspberry pi PICOs
 
-### To do
-* implement variable speed depending on recieved value from master,
-* check if it is necesarry to recalculate a and b every new speed value or I can just limit upper speed value,
+### Developing general idea of communication
+I want to use microUSB port of my PICOs. Luckly there is library <stdio.h> which allows for this type commuinication. In my approach i decided to send to microcontroller two basic informations:
+* position - target position for microcontroller in which I want the rotor to be,
+* speed - more specificly it is max angular velocity in which the rotor should spin
+
+Becouse of my decision to stay with 12-bit resolution of position controll (allmost 12-bit actually it's 4000 states/revolution which means 0,09° accuracy) if I want to make full revolution in 1 second, I need to make certain number of steps in one second and this means that I need to drive my motor with signal of X Hz, where X is number of steps necesarry to make full revolution. So to move rotor from position 0 to position 4000, with speed of 1 rev/s I have to send this two informations to microcontroller.
+
+### Do all necesarry speed/frequency/position/error calculations
+At this stage I need to teach my microcontroller how to understeand and interpret commands from master and what to do with them. My idea was to send information in format of:
+<p align="center">
+    <em>position</em> x <em>speed</em> n
+</p>
+
+Where position is any positive integer and speed is also any positive integer but in this case speed doesn't mean exact angular velocity but desired waveform frequency. Microcontroller sets position value as target via simple smoothing function. Then it calculates maximal error and minimal duty cycle which correspond to read frequency. Basing on this values it changes controll signalfrequency - error characteristics into given shape:
+
+<p align="center">
+  <img width="1000" src="https://user-images.githubusercontent.com/96399051/183921153-0078f84d-379a-473f-a26e-2afb63866919.jpg">
+</p>
+
+
+
+## To do
 * try to run master.py from linux - will be easier / adapt for both platforms (win10/11 and linux)
 * update pcb schematic with proper Pull-up's
+* implement gamepad controll,
+* implement inverse kinematics calculation
 
-### Side ideas
+
+## Side ideas
 * make it work as G-code - let the inverse kinematics caluculate entire path, but uC will recieve target points with desired speed and accelerations. It will make communication bus simpler and will not relay entirely on communication during every move.
-
+* use pyGame as simple gui
 * while controlling robot with gamepad - uC will recieve speed values for every motor instead of rotor position
+* try to implement calculating inverse speed kinematisc

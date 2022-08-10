@@ -31,17 +31,19 @@ int target_value = 0;       // current goal value
 int read_value = 0;         // value which was read by uC
 float current_value = 0.0;  // current position value - for smoothing
 float previous_value = 0.0; // previous position value - for smoothing
-float division = 0.99;           // smooting value
+float division = 0.99;      // smooting value
 int position_error = 0;     // current error in position
 float histeresis = 2.0;     // geting rid of shaky movements with histeresis
 
 // error - speed charakcteristic 
+const float error_max_default = 1000.0; //default value of max error
+const float time_min_default = 1.0;     //default value of min time
 float error_max = 1000.0;   // max value of error
 float error_min = 3.0;      // min value of error
 float time_max = 1000.0;    // max value of duty cycle
 float time_min = 1.0;       // min value of duty cycle
 float a = 1.0;              //
-float b = 0.0;              // f(x) = a * (x - b) + c
+float b = 0.0;              // f(x) = a / (x - b) + c
 float c = -0.1;             //
 
 // variable defining need of movement
@@ -77,6 +79,23 @@ const uint PIN_AB = A_PIN;
 const uint sm = 0;
 PIO pio = pio0;
 
+// function returning value of effor basing on frequency
+float error_from_frequency (float freq)
+{
+    return ((a * 2 * timer_delay * freq) / (1000000 - c * 2 * timer_delay * freq) + b);
+}
+
+// function returning value of cycle duty basing on frequency
+float cycle_from_frequency (float freq)
+{
+    return (1000000 / (2 * timer_delay * freq));
+}
+
+// function returning value of cycle duty basing on error
+float cycle_from_error (float err)
+{
+    return (a / (err - b) + c);
+}
 
 // function responsible for IRQ handling
 bool repeating_timer_callback_PTO(struct repeating_timer *t)
@@ -112,11 +131,8 @@ bool repeating_timer_callback_PTO(struct repeating_timer *t)
     } 
     else 
     {
-        // linear time, not linear speed
-        //timer_lim = (int)(a * regulator.abs_sum + b);
-        
-        // linear speed, not linear time
-        timer_lim = (int)(a / (regulator.abs_sum - b) + c);
+        // linear speed, not linear cycle duty
+        timer_lim = (int)cycle_from_error(regulator.abs_sum);
     }
     
     // setting proper direcion based on regulator sum
@@ -199,22 +215,25 @@ int main() {
     struct repeating_timer timer;
     add_repeating_timer_us(-timer_delay, repeating_timer_callback_PTO, NULL, &timer);
     
-    char incoming_char;
-    char char_array[20];
-    char speed_arr[10];
-    char position_arr[10];
-
-    memset(char_array, 0, sizeof(char_array));
-    memset(position_arr, 0, sizeof(position_arr));
-    memset(speed_arr, 0, sizeof(speed_arr));
-
+    // definition of variables
     int char_index = 0;
     int x_index = 0;    
     int n_index = 0;
     int position_value = 0;
     float speed_value = 0.0;
-    
-    
+    float error_value = 0.0;
+    float cycle_duty = 0.0;
+    char incoming_char;
+    char char_array[20];
+    char speed_arr[10];
+    char position_arr[10];
+
+    // preparing empty space for variables
+    memset(char_array, 0, sizeof(char_array));
+    memset(position_arr, 0, sizeof(position_arr));
+    memset(speed_arr, 0, sizeof(speed_arr));
+
+    // while loop
     while (1) 
     {
        
@@ -236,10 +255,26 @@ int main() {
            // make substring for speed
            memcpy(speed_arr, &char_array[x_index + 1], n_index - x_index - 1);
            
+           // decoded position and speed 
            position_value = atoi(position_arr);
            speed_value = atof(speed_arr);
 
-           printf("pos: %d  spe: %f", position_value, speed_value);
+           // make it go to desired position
+           read_value = position_value;
+
+           // calculating error basing on input frequency - speed
+           error_value = error_from_frequency(speed_value);
+
+           // calculating cycle duty basing on calculated error
+           cycle_duty = cycle_from_frequency(speed_value);
+           
+           // limiting max error on characteristic
+           error_max = error_value;
+
+           // limiting min cycle time due to input limitation
+           time_min = cycle_duty;
+
+           //printf("pos: %d  spe: %f", position_value, speed_value);
     
            
            // resetting everything
@@ -252,12 +287,5 @@ int main() {
        {
            char_index += 1;
        }
-
-      
-       
-       //data = getchar();
-       //printf("%d\n", encoder_value);
-       //printf("odczytane: %d enkoder: %d err: %d regulator-sum: %f loop-time: %d a: %f b: %f \n", target_value, encoder_value, position_error, regulator.sum, timer_lim, a, b);
-
     }
 }

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "pico/stdlib.h"
-#include "hardware/pio.h"
+#include "hardware/pio.h"  
 #include "hardware/timer.h"
 #include "hardware/gpio.h"
 
@@ -26,14 +26,18 @@ uint32_t timer_cnt = 0;     // timer current value
 uint32_t timer_lim = 1;     // timer upper limit value
 
 // position maitaining values
-int encoder_value = 0;      // current encoder reading
-int target_value = 0;       // current goal value
-int read_value = 0;         // value which was read by uC
-float current_value = 0.0;  // current position value - for smoothing
-float previous_value = 0.0; // previous position value - for smoothing
-float division = 0.99;      // smooting value
-int position_error = 0;     // current error in position
-float histeresis = 2.0;     // geting rid of shaky movements with histeresis
+int encoder_value = 0;                  // current encoder reading
+int target_position_value = 0;          // current goal value
+int read_position_value = 0;            // value which was read by uC
+float current_position_value = 0.0;     // current position value - for smoothing
+float previous_position_value = 0.0;    // previous position value - for smoothing
+int read_speed_value = 0;               // value read by uC
+int target_speed_value = 0;             // current speed goal value
+float current_speed_value = 0.0;        // current speed value - for smoothing
+float previous_speed_value = 0.0;       // previous speed value - for smoothing
+float division = 0.995;                  // smooting value
+int position_error = 0;                 // current error in position
+float histeresis = 2.0;                 // geting rid of shaky movements with histeresis
 
 // error - speed charakcteristic 
 const float error_max_default = 1000.0; //default value of max error
@@ -100,16 +104,27 @@ float cycle_from_error (float err)
 // function responsible for IRQ handling
 bool repeating_timer_callback_PTO(struct repeating_timer *t)
 {
-    // smoothing the target value
-    current_value = (1.0 - division) * (float)read_value + division * previous_value;
-    previous_value = current_value;
-    target_value = (int)current_value;
+    // smoothing the target position value
+    current_position_value = (1.0 - division) * (float)read_position_value + division * previous_position_value;
+    previous_position_value = current_position_value;
+    target_position_value = (int)current_position_value;
+
+    // smoothing the target speed value
+    current_speed_value = (1.0 - division) * (float)read_speed_value + division * previous_speed_value;
+    previous_speed_value = current_speed_value;
+    target_speed_value = (int)current_speed_value;
+
+    // calculating error basing on input frequency - speed
+    error_max = error_from_frequency(target_speed_value);
+
+    // calculating cycle duty basing on calculated error
+    time_min = cycle_from_frequency(target_speed_value);
     
     // reading of current position  via DMA
     encoder_value = quadrature_encoder_get_count(pio, sm);
 
     // defining current error basen on current and target positions
-    position_error = target_value - encoder_value;
+    position_error = target_position_value - encoder_value;
 
     // calcultion of P value based on error
     regulator.P = position_error * regulator.kP;
@@ -220,9 +235,7 @@ int main() {
     int x_index = 0;    
     int n_index = 0;
     int position_value = 0;
-    float speed_value = 0.0;
-    float error_value = 0.0;
-    float cycle_duty = 0.0;
+    float speed_value = 0;
     char incoming_char;
     char char_array[20];
     char speed_arr[10];
@@ -260,22 +273,10 @@ int main() {
            speed_value = atof(speed_arr);
 
            // make it go to desired position
-           read_value = position_value;
-
-           // calculating error basing on input frequency - speed
-           error_value = error_from_frequency(speed_value);
-
-           // calculating cycle duty basing on calculated error
-           cycle_duty = cycle_from_frequency(speed_value);
+           read_position_value = position_value;
            
-           // limiting max error on characteristic
-           error_max = error_value;
-
-           // limiting min cycle time due to input limitation
-           time_min = cycle_duty;
-
-           //printf("pos: %d  spe: %f", position_value, speed_value);
-    
+           // make it go with desired speed
+           read_speed_value = (int)speed_value;
            
            // resetting everything
            char_index = 0;

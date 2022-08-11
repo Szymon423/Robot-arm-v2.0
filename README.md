@@ -32,6 +32,7 @@ Also I want to redo entire software side of project. I want to be able of contro
   - developing general idea of communication ✔️
   - do all necesarry speed/frequency/position/error calculations, ✔️
   - simple testing program for checking if it works, ✔️
+  - implementing gamepad controll, ✔️
   - implementing inverse kinematics
   - <em>IN PROGRESS</em>
 * developing software for motion controll (maybe via website)
@@ -157,17 +158,20 @@ Where position is any positive integer and speed is also any positive integer bu
   <img width="1000" src="https://user-images.githubusercontent.com/96399051/183921153-0078f84d-379a-473f-a26e-2afb63866919.jpg">
 </p>
 
+### Implementing gamepad controll
+in this part I want to make use of gamepad as one of the ways to controll robot. In this case I want it to be able to controll robot efector position in X, Y, Z, epsilon coordinates. For this purpouse I want the analogue sticks to be interface. Additionally I want to use triggers as Dead Man Switch to add more safety. For this purpose I used <em>inputs</em> library, and write simple script utilising multithreading for asynchronous code execution - cyclic sending position and speed to microcontroller. Works quite well.
 
+<p align="center">
+  <img width="700" src="https://user-images.githubusercontent.com/96399051/184115663-e32a59c7-d5dc-4362-ab84-686d0e243441.jpg">
+</p>
 
 ## To do
 * try to run master.py from linux - will be easier / adapt for both platforms (win10/11 and linux)
 * update pcb schematic with proper Pull-up's
-* implement gamepad controll,
 * implement inverse kinematics calculation
 
 
 ## Side ideas
 * make it work as G-code - let the inverse kinematics caluculate entire path, but uC will recieve target points with desired speed and accelerations. It will make communication bus simpler and will not relay entirely on communication during every move.
 * use pyGame as simple gui
-* while controlling robot with gamepad - uC will recieve speed values for every motor instead of rotor position
 * try to implement calculating inverse speed kinematisc

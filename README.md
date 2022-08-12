@@ -166,12 +166,14 @@ in this part I want to make use of gamepad as one of the ways to controll robot.
 </p>
 
 ## To do
+* figure out how to controll cooling fans, how to controll robot efector - another PCB as IO Board?
 * try to run master.py from linux - will be easier / adapt for both platforms (win10/11 and linux)
 * update pcb schematic with proper Pull-up's
 * implement inverse kinematics calculation
 
 
 ## Side ideas
+* maybe good idea is to make something like Robot class, which i can use in machine vision, and similar usage,
 * make it work as G-code - let the inverse kinematics caluculate entire path, but uC will recieve target points with desired speed and accelerations. It will make communication bus simpler and will not relay entirely on communication during every move.
 * use pyGame as simple gui
 * try to implement calculating inverse speed kinematisc

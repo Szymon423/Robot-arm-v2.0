@@ -124,7 +124,13 @@ By analysing different approaches to controll stepper motor in closed loop I hav
   <img width="1000" src="https://user-images.githubusercontent.com/96399051/182338735-32e1ed78-0daf-421e-ab7e-89b710a62dbc.jpg">
 </p>
 
-In this approach I decided to set a few important values which determine error-speed characteristic in way that make it possible for microcontroller to handle. By this I mean lower and upper limitations. These values can ba adjusted to improve stability with different loads - different stages of robot.
+In this approach I decided to set a few important values which determine error-speed characteristic in way that make it possible for microcontroller to handle. By this I mean lower and upper limitations. These values can ba adjusted to improve stability with different loads - different stages of robot. Equation which determines the characteristic in non limited error ares is:
+
+<p align="center">
+  <img width="300" src="https://user-images.githubusercontent.com/96399051/185145004-bdffe8b3-2b23-4037-bfac-3a393f2fb701.png">
+</p>
+
+Parameters <em>a, b</em> are calculated basing on max and min values for error and time intervals and also <em>c</em> parameter which deterines how linear is frequency characteristic (for c << 1 characteristic is more linear, for c >> 1 characteristic is more like parabola).
 
 <p align="center">
   <img width="1000" src="https://user-images.githubusercontent.com/96399051/183686434-0e95f153-8f3b-4f30-a677-0e85a73da3e2.jpg">

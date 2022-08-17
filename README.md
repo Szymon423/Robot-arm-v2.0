@@ -174,7 +174,6 @@ in this part I want to make use of gamepad as one of the ways to controll robot.
 ## To do
 * figure out how to controll cooling fans, how to controll robot efector - another PCB as IO Board?
 * try to run master.py from linux - will be easier / adapt for both platforms (win10/11 and linux)
-* update pcb schematic with proper Pull-up's
 * implement inverse kinematics calculation
 
 

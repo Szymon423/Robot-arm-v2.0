@@ -19,6 +19,12 @@ class Robot:
         pass
 
 
+    def initialiseDrives(self):
+        """method responsible for initialising all drives - necessary for further actions"""
+        # to do - checking communication with each drive
+        pass
+
+
     def calculateInversKinematics (self, p):
         """method for calculating desired kartesian coordinates basing on angles"""
         
@@ -31,6 +37,7 @@ class Robot:
     def calculateInversKinematics (self, p):
         """method for calculating angles basing on desired kartesian coordinates"""
         
+        # side calculations
         R = np.sqrt(np.power(p.x, 2) + np.power(p.y, 2))
         p = R - self.d3 * np.cos(p.eps)
         h = p.z - self.d4 + self.d3 * np.sin(p.eps)
@@ -53,3 +60,7 @@ class Robot:
         """method for finding home position of every drive"""
         # to do
         pass
+
+
+
+

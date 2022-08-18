@@ -13,8 +13,16 @@ class Robot:
     d3 = 0.4
     d4 = 0.15
 
-    def __init__(self):
+    # logic permisions
+    drivesOk = [False, False, False, False]
+    homingDone = False
+
+    def __init__(self, d1, d2, d3, d4):
         """initialisation of robot object"""
+        self.d1 = d1
+        self.d2 = d2
+        self.d3 = d3
+        self.d4 = d4
         # to do
         pass
 
@@ -22,6 +30,11 @@ class Robot:
     def initialiseDrives(self):
         """method responsible for initialising all drives - necessary for further actions"""
         # to do - checking communication with each drive
+        # it has to be sth like: send broadcast info to all drives maybe "WhoAreYou"
+        # and wait for response of each of them. They have to introduce themselves by responding
+        # with proper number 1-4, or name. Then I can assign proper angle to corresponding motor.
+        # After this command User has to perform homing sequention
+        # still need to implement identification in mcu
         pass
 
 
@@ -58,7 +71,12 @@ class Robot:
     
     def findHomePosition (self):
         """method for finding home position of every drive"""
-        # to do
+        # to do - homing sequention should be done in following order
+        #   drive nr. 1
+        #   drive nr. 4
+        #   drive nr. 3
+        #   drive nr. 2
+        # At the very beginning absolute position of every drive  
         pass
 
 
